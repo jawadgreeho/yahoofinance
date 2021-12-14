@@ -42,6 +42,13 @@ fs.createReadStream('companies.csv')
             })
 
             console.log(result);
+
+            for (const [key, value] of Object.entries(result)) {
+                for(let i = 0; i < value.length; i++)
+                console.log(`${key}: ${value?.[i]?.close ?? ""} ${value?.[i]?.date ?? ""}`);
+              }
+
+        // console.log(result.'583.SI'[0].close);
         }
         catch(err){
             console.log(err);
@@ -50,7 +57,9 @@ fs.createReadStream('companies.csv')
 
     
 
-    setTimeout(function(){ getData() }, 10000);
+    setTimeout(function(){ getData() }, 1000);
+
+    
 // yahooFinance.historical({
 //     symbols: ['AAPL', 'GOOGL', '9E8.F',],
 //     from: '2012-01-01',
