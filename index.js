@@ -75,7 +75,7 @@ const csvWriter = createCsvWriter({
     header: headers
 });
   
-async function run() {
+const run = async() => {
             try{
                 fs.createReadStream('companies.csv')
                 .pipe(csv(['company', 'origin']))
