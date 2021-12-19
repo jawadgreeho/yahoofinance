@@ -14,8 +14,7 @@ app.listen(3001, ()=>{
 const results = [] 
 const companies = []
 const headers = []
-const output = [{}, {}, {}, {}, {}]
-const options = { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric' };
+const output = []
 
 const getCompanies = (results) => {
     for(let i = 0; i < results.length; i++){
@@ -51,7 +50,7 @@ fs.createReadStream('companies.csv')
             for (const [key, value] of Object.entries(result)) {
                 for(let i = 0; i < value.length; i++){
                     if(j) {
-                        output[i]['Date'] = value?.[i]?.date.toISOString()
+                        output.push({Date: value?.[i]?.date.toISOString()})
                     }
                     console.log(`${key}: ${value?.[i]?.close.toFixed(3) ?? ""} ${value?.[i]?.date ?? ""}`);
                     output[i][value?.[i]?.symbol] = value?.[i]?.close?.toFixed(3)
