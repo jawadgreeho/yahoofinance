@@ -16,31 +16,29 @@ const output = []
 const validation = async(req, res, next) => {
     const origin = req.get('origin');
     console.log("origin", origin);
-    let { symbol, startDate, endDate } = req.query;
+    let { symbol } = req.query;
     console.log("symbol", symbol);
-    const as = await domains(symbol)
-    console.log("allowed", as);
-    next();
-    // if(a.includes(origin)) {
-    //     console.log("origin", origin);
-    //     console.log("res", res);
-    //     next()
-    // }
-    // else {
-    //     console.log("");
-    //     res.status(403).json({ message: "Forbidden" });
-    // }
+    const allowed = await domains(symbol)
+    console.log("allowed", allowed);
+    if(allowed.includes(origin)) {
+        console.log("origin", origin);
+        next()
+    }
+    else {
+        console.log("");
+        res.status(403).json({ message: "Forbidden" });
+    }
 }
 
 const domains = (symbol) => {
     console.log("sym", symbol);
+    let temp = ""
     results.forEach(function (arrayItem) {
-        let x = arrayItem.company;
-        if(x === symbol){
-            console.log("returning", arrayItem.origin);
-            return arrayItem.origin
+        if(arrayItem.company === symbol){
+            temp = arrayItem.origin
         }
     });
+    return temp.split(',');
 }
 app.use(validation)
 
@@ -49,7 +47,8 @@ app.listen(3001, ()=>{
 });
 
 app.get('/company', (req, res)=>{
-    res.status(200).json({data: "Hi" })
+    let { symbol, startDate, endDate } = req.query;
+    res.status(200).json("hi")
 })
 
 const pipeline = util.promisify(stream.pipeline);
@@ -119,6 +118,7 @@ const run = async() => {
             await createHeader()
             await getData()
             csvWriter.writeRecords(output)
+            console.log("output", output);
             console.log('Written to file successfully');
         })
     }catch(error){
