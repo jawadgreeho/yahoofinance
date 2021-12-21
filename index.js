@@ -1,8 +1,8 @@
 const express = require('express');
 const csv = require('csv-parser')
 const fs = require('fs');
-const util = require('util');
-const stream = require('stream');
+// const util = require('util');
+// const stream = require('stream');
 const yahooFinance = require('yahoo-finance');
 
 const app = express();
@@ -11,8 +11,9 @@ const results = []
 const companies = []
 const headers = []
 const output = []
-// app.use(express.json())
 
+
+//VALIDATION MIDDLEWARE CHECKS WHETHER REQ COMES FROM AUTHORIZED ORIGIN 
 const validation = async(req, res, next) => {
     const origin = req.get('origin');
     console.log("origin", origin);
@@ -30,6 +31,7 @@ const validation = async(req, res, next) => {
     }
 }
 
+//RETURNS THE AUTHORIZED ORIGIN(s) FOR A SPECIFIC URL ENDPOINT
 const domains = (symbol) => {
     console.log("sym", symbol);
     let temp = ""
@@ -40,37 +42,55 @@ const domains = (symbol) => {
     });
     return temp.split(',');
 }
+//USE VALIDATION MIDDLEWARE FOR ALL GET REQ
 app.use(validation)
 
 app.listen(3001, ()=>{
     console.log('server running on port 3001');
 });
 
+//TASK 2
+//RETURNS THE CLOSING PRICE OF GIVEN SYMBOL FROM STARTDATE TO ENDDATE
 app.get('/company', (req, res)=>{
     let { symbol, startDate, endDate } = req.query;
-    res.status(200).json("hi")
+    const startToDate = new Intl.DateTimeFormat("en-us", { day: "2-digit" }).format(new Date(startDate))
+    const endToDate = new Intl.DateTimeFormat("en-us", { day: "2-digit" }).format(new Date(endDate))
+    let closingPrice = []
+    output.forEach(function (arrayItem) {
+        console.log("arrayItem", arrayItem);
+        let tempObj = {}
+        const dateToCompare = new Intl.DateTimeFormat("en-us", { day: "2-digit" }).format(new Date(arrayItem.Date))
+        if(dateToCompare >= startToDate && dateToCompare <= endToDate){
+            tempObj.date = arrayItem.Date;
+            tempObj.close = arrayItem[symbol];
+            tempObj.symbol = symbol;
+
+            closingPrice.push(tempObj)
+        }
+    });
+        
+    console.log(closingPrice);
+    res.status(200).json(closingPrice)
 })
 
-const pipeline = util.promisify(stream.pipeline);
 
 const getCompanies = async() => {
     for(let i = 0; i < results.length; i++){
      companies.push(results[i].company) 
     }
-    // console.log("printing companies", companies);
     return companies
 }
 
+//FETCH CLOSING PRICE FROM YAHOO FINANCE FOR GIVEN TICKERS
 const getData = async() => {
     try{
         const result = await yahooFinance.historical({
             symbols: companies,
             from: '2012-01-01',
             to: '2012-01-10',
-            period: 'd'  // 'd' (daily), 'w' (weekly), 'm' (monthly), 'v' (dividends only)
+            period: 'd'
         })
 
-        // console.log(result);
         let j = true
         for (const [key, value] of Object.entries(result)) {
             for(let i = 0; i < value.length; i++){
@@ -81,9 +101,7 @@ const getData = async() => {
                 output[i][value?.[i]?.symbol] = value?.[i]?.close?.toFixed(3)
             }
             j = false
-            // console.log("output", output);
             }
-    // console.log("printing output", output);
     return output
     }
     catch(err){
@@ -91,12 +109,11 @@ const getData = async() => {
     }
 }
 
-    
+//RETURN     
 const createHeader = async() => {
     headers.push({id: 'Date', title: 'Date'})
     for (let i = 0; i < companies.length; i++){
         headers.push({id: companies[i], title: companies[i]})
-        // console.log("headers", headers);
     }
     return headers;
 }
@@ -107,6 +124,8 @@ const csvWriter = createCsvWriter({
     header: headers
 });
   
+//INITIALIZE APP
+//TASK 1
 const run = async() => {
     try{
         fs.createReadStream('companies.csv')
