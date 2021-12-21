@@ -16,11 +16,8 @@ const output = []
 //VALIDATION MIDDLEWARE CHECKS WHETHER REQ COMES FROM AUTHORIZED ORIGIN 
 const validation = async(req, res, next) => {
     const origin = req.get('origin');
-    console.log("origin", origin);
     let { symbol } = req.query;
-    console.log("symbol", symbol);
     const allowed = await domains(symbol)
-    console.log("allowed", allowed);
     if(allowed.includes(origin)) {
         console.log("origin", origin);
         next()
@@ -73,7 +70,7 @@ app.get('/company', (req, res)=>{
     res.status(200).json(closingPrice)
 })
 
-
+//STORE THE TICKER SYMBOL IN COMPANIES ARRAY
 const getCompanies = async() => {
     for(let i = 0; i < results.length; i++){
      companies.push(results[i].company) 
@@ -108,8 +105,8 @@ const getData = async() => {
         console.log(err);
     }
 }
-
-//RETURN     
+  
+//STORE THE DATE IN HEADERS ARRAY
 const createHeader = async() => {
     headers.push({id: 'Date', title: 'Date'})
     for (let i = 0; i < companies.length; i++){
