@@ -53,8 +53,8 @@ app.listen(3001, ()=>{
 //RETURNS THE CLOSING PRICE OF GIVEN SYMBOL FROM STARTDATE TO ENDDATE
 app.get('/company', (req, res)=>{
     let { symbol, startDate, endDate } = req.query;
-    const startToDate = new Intl.DateTimeFormat("en-us", { day: "2-digit" }).format(new Date(startDate))
-    const endToDate = new Intl.DateTimeFormat("en-us", { day: "2-digit" }).format(new Date(endDate))
+    const startToDate = new Intl.DateTimeFormat("en-us", { day: "2-digit" }).format(new Date(startDate ?? "2012-01-01"))
+    const endToDate = new Intl.DateTimeFormat("en-us", { day: "2-digit" }).format(new Date(endDate ?? "2012-01-09"))
     let closingPrice = []
     output.forEach(function (arrayItem) {
         console.log("arrayItem", arrayItem);
