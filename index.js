@@ -59,7 +59,7 @@ app.get('/company', (req, res)=>{
         const dateToCompare = new Intl.DateTimeFormat("en-us", { day: "2-digit" }).format(new Date(arrayItem.Date))
         if(dateToCompare >= startToDate && dateToCompare <= endToDate){
             tempObj.date = arrayItem.Date;
-            tempObj.close = arrayItem[symbol];
+            tempObj.close = arrayItem[symbol] ?? "";
             tempObj.symbol = symbol;
 
             closingPrice.push(tempObj)
